@@ -22,7 +22,7 @@ function start(api,callbak){
     app.use(helmet());
     app.use(bodyParser.json());
     api(app);
-    app.use((err,req,res,next)=>{
+    app.use((req,res,next)=>{
        res.status(404).json({message: 'Página não encontrada'});
     });
 
