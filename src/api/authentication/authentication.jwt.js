@@ -8,13 +8,24 @@ const verifyJWT = async (req, res, next)=>{
     if(!token){
         return res.status(401).send({ mensagem: 'Não autorizado' });
     }
-    let userToken = jwt.verify(token.split(' ')[1],process.env.SECRET);
-    let user = await service.findByEmail(userToken.email);
-    if(token !== 'Bearer ' + user.token){
-        return res.status(401).send({ mensagem: 'Não autorizado' });
+    if(token.split(' ').length != 2){
+        return res.status(401).send({ mensagem: 'token em um formato inválido' });
     }
 
-    next();
+    jwt.verify(token.split(' ')[1],process.env.SECRET,async(err,userToken)=>{
+        if(err){
+            return res.status(401).send({ mensagem: 'Sessão inválid' });
+        }
+
+        let user = await service.findByEmail(userToken.email);
+        if(token !== 'Bearer ' + user.token){
+            return res.status(401).send({ mensagem: 'Não autorizado' });
+        }
+        next();
+    });
+    
+
+   
 }
 
 module.exports = verifyJWT;
