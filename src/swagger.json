@@ -1,165 +1,273 @@
 {
-    "swagger": "2.0",
-    "info": {
-      "version": "1.0.0",
-      "title": "User Manager",
-      "description": "User Manager",
-      "license": {
-        "name": "MIT",
-        "url": "https://opensource.org/licenses/MIT"
-      }
-    },
-    "host": "localhost:3001",
-    "basePath": "/api/v1",
-    "tags": [
-      {
-        "name": "Users",
-        "description": "API for users in the system"
-      }
-    ],
-    "schemes": [
-      "http"
-    ],
-    "consumes": [
-      "application/json"
-    ],
-    "produces": [
-      "application/json"
-    ],
-    "paths": {
-      "/users": {
-        "post": {
-          "tags": [
-            "Users"
-          ],
-          "description": "Create new user in system",
-          "parameters": [
-            {
-              "name": "user",
-              "in": "body",
-              "description": "User that we want to create",
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SKY",
+    "description": "Gerenciador de usuário.",
+    "version": "0.0.1"
+  },
+  "servers": [
+    {
+      "url": "https://sky-application.herokuapp.com/"
+    }
+  ],
+  "paths": {
+    "/signup": {
+      "summary": "Criar usuário para acesso a aplicação.",
+      "post": {
+        "summary": "cria um novo usuário.",
+        "requestBody": {
+          "content": {
+            "application/json": {
               "schema": {
-                "$ref": "#/definitions/User"
-              }
-            }
-          ],
-          "produces": [
-            "application/json"
-          ],
-          "responses": {
-            "200": {
-              "description": "New user is created",
-              "schema": {
-                "$ref": "#/definitions/User"
+                "type": "object",
+                "$ref": "#/components/schemas/UsuarioRequest"
               }
             }
           }
         },
-        "get": {
-          "tags": [
-            "Users"
-          ],
-          "summary": "Get all users in system",
-          "responses": {
-            "200": {
-              "description": "OK",
-              "schema": {
-                "$ref": "#/definitions/Users"
+        "responses": {
+          "201": {
+            "description": "returna o usuário criado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "e-mail já existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/Mensagem"
+                }
               }
             }
           }
         }
-      },
-      "/users/{id}": {
+      }
+    },
+    "/signin": {
+      "summary": "autenticar",
+      "post": {
+        "summary": "autenticar no sistema",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "$ref": "#/components/schemas/Signin"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "retorna o usuário autenticado com token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Usuário e/ou senha inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/Mensagem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "summary": "Retorna todos os usuários",
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "lista todos os usuário",
+        "responses": {
+          "200": {
+            "description": "returna todos os usuários",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UsuarioResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/Mensagem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "retorna o usuário pelo id informado",
         "parameters": [
           {
-            "name": "id",
             "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
             "required": true,
-            "description": "ID of user that we want to find",
-            "type": "string"
+            "description": "id do usuário para pesquisa"
           }
         ],
-        "get": {
-          "tags": [
-            "Users"
-          ],
-          "summary": "Get user with given ID",
-          "responses": {
-            "200": {
-              "description": "User is found",
-              "schema": {
-                "$ref": "#/definitions/User"
+        "responses": {
+          "200": {
+            "description": "usuário retornado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                }
               }
             }
-          }
-        },
-        "delete": {
-          "summary": "Delete user with given ID",
-          "tags": [
-            "Users"
-          ],
-          "responses": {
-            "200": {
-              "description": "User is deleted",
-              "schema": {
-                "$ref": "#/definitions/User"
-              }
-            }
-          }
-        },
-        "put": {
-          "summary": "Update user with give ID",
-          "tags": [
-            "Users"
-          ],
-          "parameters": [
-            {
-              "name": "user",
-              "in": "body",
-              "description": "User with new values of properties",
-              "schema": {
-                "$ref": "#/definitions/User"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "User is updated",
-              "schema": {
-                "$ref": "#/definitions/User"
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/Mensagem"
+                }
               }
             }
           }
         }
       }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
     },
-    "definitions": {
-      "User": {
-        "required": [
-          "email",
-          "_id"
-        ],
+    "schemas": {
+      "UsuarioRequest": {
         "properties": {
-          "_id": {
-            "type": "string",
-            "uniqueItems": true
+          "nome": {
+            "type": "string"
           },
           "email": {
-            "type": "string",
-            "uniqueItems": true
+            "type": "string"
           },
           "senha": {
             "type": "string"
           },
-          "telefone": {
-            "type": "array"
+          "telefones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Telefone"
+            }
+          }
+        },
+        "required": [
+          "nome",
+          "email",
+          "senha",
+          "telefones"
+        ],
+        "type": "object"
+      },
+      "UsuarioResponse": {
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "telefones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Telefone"
+            }
+          },
+          "data_criacao": {
+            "type": "string"
+          },
+          "data_atualizacao": {
+            "type": "string"
+          },
+          "ultimo_login": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Telefone": {
+        "properties": {
+          "ddd": {
+            "type": "string"
+          },
+          "numero": {
+            "type": "string"
           }
         }
       },
-      "Users": {
-        "type": "array",
-        "$ref": "#/definitions/User"
+      "Mensagem": {
+        "properties": {
+          "mensagem": {
+            "type": "string"
+          }
+        }
+      },
+      "Signin": {
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "senha": {
+            "type": "string"
+          }
+        }
       }
     }
   }
+}
